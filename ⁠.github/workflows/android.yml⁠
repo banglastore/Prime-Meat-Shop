@@ -1,0 +1,36 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build Web App to APK
+      run: |
+        npm install -g @capacitor/cli
+        npm install @capacitor/core @capacitor/android
+        npx cap init PrimeMeatShop com.mdantorsarker.primemeatshop --web-dir .
+        npx cap add android
+        npx cap copy android
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: PrimeMeatShop-APK
+        path: android/app/build/outputs/apk/debug/app-debug.apk
