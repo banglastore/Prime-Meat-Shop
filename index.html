@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Prime Order" />
+  <title>Prime Meat Shop Order</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand">
+      <div class="brandMark">PMS</div>
+      <div>
+        <div class="brandTitle">Prime Meat Shop</div>
+        <div class="brandSub">Digital Order Form</div>
+      </div>
+    </div>
+    <button class="iconBtn" id="historyBtn" type="button" aria-label="Order history">History</button>
+  </header>
+
+  <main class="main">
+    <section class="controls card">
+      <div class="controlGrid">
+        <label class="field wide">
+          <span>Shop</span>
+          <div class="inlineControl">
+            <select id="shopSelect"></select>
+            <button class="smallBtn" id="addShopBtn" type="button">+ Add</button>
+            <button class="smallBtn danger" id="deleteShopBtn" type="button">Delete</button>
+          </div>
+        </label>
+        <label class="field">
+          <span>Form</span>
+          <select id="templateSelect"></select>
+        </label>
+        <label class="field stampField">
+          <span>Date</span>
+          <input id="orderDate" type="date" />
+          <strong id="liveStamp">--</strong>
+        </label>
+      </div>
+    </section>
+
+    <section class="pageWrap">
+      <div class="pageToolbar">
+        <button id="prevBtn" class="navBtn" type="button">← Previous</button>
+        <strong id="pageIndicator">Page 1 / 2</strong>
+        <button id="nextBtn" class="navBtn primary" type="button">Next →</button>
+      </div>
+
+      <div class="paperShell" id="paperShell">
+        <div class="paper" id="paper">
+          <img id="pageImage" alt="Order form page" draggable="false" />
+          <div id="headerCover" class="headerCover">
+            <div id="pdfShopHeader" class="pdfShopHeader">PRIME MEAT SHOP</div>
+            <div class="pdfDateBlock">
+              <div id="pdfDate">DATE: --/--/----</div>
+              <div id="pdfTime">DAY: --------</div>
+            </div>
+          </div>
+          <div id="hotspots"></div>
+        </div>
+      </div>
+
+      <div id="otherItemsPanel" class="otherItemsPanel hidden"><button id="addOtherMeatBtn" class="mainAction full" type="button">+ Add Other Meat</button><div id="otherItemsList" class="otherItemsList"></div></div>
+      <div class="hint">Order box-এ tap করুন → quantity লিখুন → KG / PCS / BOX / TRAY বেছে নিন। পাশের second box খালি থাকবে।</div>
+
+      <div class="actions card">
+        <button id="newOrderBtn" class="secondaryAction" type="button">New Order</button>
+        <button id="previewBtn" class="secondaryAction" type="button">Preview PDF</button>
+        <button id="saveBtn" class="mainAction" type="button">Save / Share PDF</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="entryModal" role="dialog" aria-modal="true">
+    <div class="modalCard entryCard">
+      <div class="modalTop">
+        <div>
+          <div class="eyebrow">ORDER ITEM</div>
+          <h2 id="entryTitle">Item</h2>
+        </div>
+        <button class="closeBtn" data-close="entryModal" type="button">×</button>
+      </div>
+      <label class="field quantityField">
+        <span>Quantity</span>
+        <input id="qtyInput" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 5" />
+      </label>
+      <div class="field">
+        <span>Unit</span>
+        <div class="unitGrid" id="unitGrid">
+          <button type="button" data-unit="KG">KG</button>
+          <button type="button" data-unit="PCS">PCS</button>
+          <button type="button" data-unit="BOX">BOX</button>
+          <button type="button" data-unit="TRAY">TRAY</button>
+        </div>
+      </div>
+      <div class="modalActions">
+        <button id="clearItemBtn" class="smallBtn danger" type="button">Clear</button>
+        <button id="saveItemBtn" class="mainAction" type="button">Save Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="shopModal" role="dialog" aria-modal="true">
+    <div class="modalCard smallModal">
+      <div class="modalTop">
+        <div>
+          <div class="eyebrow">SHOP</div>
+          <h2>Add Shop Name</h2>
+        </div>
+        <button class="closeBtn" data-close="shopModal" type="button">×</button>
+      </div>
+      <label class="field">
+        <span>Shop name</span>
+        <input id="shopNameInput" type="text" autocomplete="off" placeholder="e.g. Tower" maxlength="40" />
+      </label>
+      <button id="saveShopBtn" class="mainAction full" type="button">Save Shop</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="previewModal" role="dialog" aria-modal="true">
+    <div class="modalCard previewCard">
+      <div class="modalTop">
+        <div>
+          <div class="eyebrow">PDF PREVIEW</div>
+          <h2>2-page Order PDF</h2>
+        </div>
+        <button class="closeBtn" data-close="previewModal" type="button">×</button>
+      </div>
+      <iframe id="previewFrame" title="PDF Preview"></iframe>
+      <button id="previewShareBtn" class="mainAction full" type="button">Save / Share PDF</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="historyModal" role="dialog" aria-modal="true">
+    <div class="modalCard historyCard">
+      <div class="modalTop">
+        <div>
+          <div class="eyebrow">SAVED IN APP</div>
+          <h2>Order History</h2>
+        </div>
+        <button class="closeBtn" data-close="historyModal" type="button">×</button>
+      </div>
+      <div id="historyList" class="historyList"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="customItemModal" role="dialog" aria-modal="true">
+    <div class="modalCard smallModal">
+      <div class="modalTop"><div><div class="eyebrow">OTHER ITEMS</div><h2>Add Custom Item</h2></div><button class="closeBtn" data-close="customItemModal" type="button">×</button></div>
+      <label class="field"><span>Item name</span><input id="customItemName" type="text" maxlength="38" placeholder="e.g. Goat Meat" /></label>
+      <div class="modalActions"><button id="deleteCustomItemBtn" class="smallBtn danger" type="button">Delete</button><button id="saveCustomItemBtn" class="mainAction" type="button">Save Name</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
